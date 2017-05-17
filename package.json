@@ -1,0 +1,41 @@
+{
+  "name": "m-grid",
+  "version": "1.0.0",
+  "description": "A simple grid for angular with pagination",
+  "scripts": {
+    "gulp": "gulp",
+    "lint": "gulp test:lint",
+    "test": "gulp test",
+    "bower": "bower"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kishanmundha/m-grid.git"
+  },
+  "keywords": [
+    "grid",
+    "angular-grid",
+    "m-grid"
+  ],
+  "author": "kishan.mundha@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kishanmundha/m-grid/issues"
+  },
+  "homepage": "https://github.com/kishanmundha/m-grid#readme",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^4.2.2",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "jasmine-core": "^2.6.1",
+    "karma": "^1.7.0",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4"
+  }
+}

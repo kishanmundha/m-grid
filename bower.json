@@ -1,0 +1,22 @@
+{
+  "name": "m-grid",
+  "description": "A simple grid for angular with pagination",
+  "main": "",
+  "authors": [
+    "kishan.mundha@gmail.com"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "grid",
+    "angular-grid",
+    "m-grid"
+  ],
+  "homepage": "https://github.com/kishanmundha/m-grid",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
