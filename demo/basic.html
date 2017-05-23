@@ -1,0 +1,121 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+
+    <link rel="stylesheet" href="../src/m-grid.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+
+    <script src="../src/m-grid.module.js"></script>
+    <script src="../src/m-grid.config.js"></script>
+    <script src="../src/m-grid.directive.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/vs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+
+    <style>
+        html,
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            height: 100%;
+            font-size: 13px;
+        }
+
+        table {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">m-grid</a>
+            </div>
+        </div>
+    </nav>
+
+    <div ng-app="app" ng-controller="appCtrl" class="container">
+        <m-grid grid-options="gridOptions"></m-grid>
+    </div>
+
+    <script>
+        var app = angular.module('app', ['m-grid']);
+
+        app.controller('appCtrl', function ($scope) {
+            $scope.gridOptions = {
+                columns: [{
+                    name: '#',
+                    field: 'id'
+                }, {
+                    name: 'Full name',
+                    field: 'fullName'
+                }, {
+                    name: 'Email',
+                    field: 'email'
+                }]
+            };
+
+            var data = [];
+
+            for (var i = 0; i < 10; i++) {
+                data.push({
+                    id: (i + 1),
+                    fullName: 'Name ' + (i + 1),
+                    email: 'email' + (i + 1) + '@test.com'
+                })
+            }
+
+            $scope.gridOptions.data = data;
+        })
+    </script>
+
+    <div class="container">
+        <h3>Code</h3>
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="html">
+&lt;div ng-app="app" ng-controller="appCtrl"&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+var app = angular.module('app', ['ui.bootstrap', 'm-grid']);
+
+app.controller('appCtrl', function($scope) {
+    $scope.gridOptions = {
+        columns: [{
+            name: '#',
+            field: 'id'
+        }, {
+            name: 'Full name',
+            field: 'fullName'
+        }, {
+            name: 'Email',
+            field: 'email'
+        }]
+    }
+
+    var data = [];
+
+    for(var i=0; i<10; i++) {
+        data.push({
+            id: (i+1),
+            fullName: 'Name ' + (i+1),
+            email: 'email' + (i+1) + '@test.com'
+        })
+    }
+
+    $scope.gridOptions.data = data;
+})
+&lt;/script&gt;
+      </code>
+    </pre>
+    </div>
+
+</body>
+
+</html>
