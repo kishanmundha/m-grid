@@ -53,13 +53,16 @@
             $scope.gridOptions = {
                 columns: [{
                     name: '#',
-                    field: 'id'
+                    field: 'id',
+                    cellTemplate: '<span class="badge">{{item.id}}</span>'
                 }, {
                     name: 'Full name',
-                    field: 'fullName'
+                    field: 'fullName',
+                    cellTemplate: '<span class="label label-primary">{{item.fullName}}</span>'
                 }, {
                     name: 'Email',
-                    field: 'email'
+                    field: 'email',
+                    cellTemplate: '<span class="glyphicon glyphicon-share-alt"></span><span>{{item.email}}</span>'
                 }]
             };
 
@@ -90,13 +93,16 @@ app.controller('appCtrl', function($scope) {
     $scope.gridOptions = {
         columns: [{
             name: '#',
-            field: 'id'
+            field: 'id',
+            cellTemplate: '&lt;span class="badge"&gt;{{item.id}}&lt;/span&gt;'
         }, {
             name: 'Full name',
-            field: 'fullName'
+            field: 'fullName',
+            cellTemplate: '&lt;span class="label label-primary"&gt;{{item.fullName}}&lt;/span&gt;'
         }, {
             name: 'Email',
-            field: 'email'
+            field: 'email',
+            cellTemplate: '&lt;span class="glyphicon glyphicon-share-alt"&gt;&lt;/span&gt;&lt;span&gt;{{item.email}}&lt;/span&gt;'
         }]
     }
 
@@ -115,6 +121,8 @@ app.controller('appCtrl', function($scope) {
 &lt;/script&gt;
       </code>
     </pre>
+
+    <blockquote>We can access current cell data by using <code>{{item}}</blockquote>
     </div>
 
 </body>

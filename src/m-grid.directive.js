@@ -2,7 +2,7 @@
 
 angular.module('m-grid.directive', ['m-grid.config'])
 
-.directive('mGrid', ['$log', '$compile', 'config', function ($log, $compile, config) {
+.directive('mGrid', ['$log', '$compile', 'mGridConfig', 'mGridService', function ($log, $compile, mGridConfig, mGridService) {
     /**
      * Link function for directive
      * @param {*} scope
@@ -17,35 +17,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         // compile html
         (function () {
-            var html = '';
-
-            html += '<div style="overflow-x:auto;width: 100%;">';
-            html += '<table class="' + config.tableClass + '">';
-            html += '<thead>';
-            html += '<tr>';
-            html += '<th ng-repeat="column in gridOptions.columns" class="' + config.thClass + '">';
-            html += '<span ng-bind="column.name">Name</a>';
-            html += '</th>';
-            html += '</tr>';
-            html += '</thead>';
-            html += '<tbody>';
-            html += '<tr ng-repeat="item in gridOptions.data">';
-
-            angular.forEach($scope.gridOptions.columns, function (item) {
-                var cellTemplate = '<td>';
-
-                cellTemplate += '<span ng-bind="item[\'' + item.field + '\']"></span>';
-
-                cellTemplate += '</td>';
-
-                html += cellTemplate;
-            });
-
-            html += '</tr>';
-            html += '</tbody>';
-            html += '</thead>';
-            html += '</table>';
-            html += '</div>';
+            var html = mGridService.getGridTemplate($scope.gridOptions, mGridConfig);
 
             element.append(html);
 

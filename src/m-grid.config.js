@@ -2,7 +2,7 @@
 
 angular.module('m-grid.config', [])
 
-.constant('config', {
+.constant('mGridConfig', {
     tableClass: 'table table-striped table-bordered',
     thClass: 'm-grid-th'
 });
