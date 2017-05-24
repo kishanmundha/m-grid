@@ -50,7 +50,7 @@ angular.module('m-grid.service', [])
         if (column.cellTemplate) {
             cellTemplate += '<div ng-init="row={\'entity\':item}">' + column.cellTemplate + '</div>';
         } else {
-            cellTemplate += '<span ng-bind="item[\'' + column.field + '\']"></span>';
+            cellTemplate += '<span ng-bind="item[\'' + column.field + '\']' + (column.format ? ' | ' + column.format : '') + '"></span>';
         }
 
         cellTemplate += '</td>';

@@ -41,4 +41,16 @@ describe('m-grid.service', function () {
 
         expect(template).toBe('<td><div ng-init="row={\'entity\':item}"><span>my-custom-template</span></div></td>');
     });
+
+    it('m-grid.service getCellTemplate cell text format', function () {
+        var column = {
+            name: 'Price',
+            field: 'price',
+            format: 'currency'
+        };
+
+        var template = mGridService.getCellTemplate(column);
+
+        expect(template).toBe('<td><span ng-bind="item[\'price\'] | currency"></span></td>');
+    });
 });
