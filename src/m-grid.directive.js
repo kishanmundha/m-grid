@@ -23,6 +23,13 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
             $compile(element.contents())($scope);
         })();
+
+        // make a external scope
+        // it will retrun a object from `$parent` scope.
+        // default it take `states` obejct from `$parent` scope
+        $scope.getExternalScope = function () {
+            return $scope.$parent[$scope.gridOptions.externalScope || 'states'] || {};
+        };
     }
 
     return {
