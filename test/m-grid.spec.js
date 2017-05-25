@@ -52,4 +52,51 @@ describe('m-grid.directive', function () {
         $scope.$digest();
         expect(element.html()).toContain('<div class="ng-scope">m-grid</div>');
     });
+
+    it('m-grid external scope event', function () {
+        var $scope = $rootScope.$new();
+        $scope.gridOptions = {
+            columns: []
+        };
+        var element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
+        $scope.$digest();
+
+        var gridScope = element.isolateScope();
+        expect(gridScope.getExternalScope()).toBeDefined();
+        expect(gridScope.getExternalScope().click).toBeUndefined();
+
+        $scope.states = {
+            click: function () {},
+            value: 2
+        };
+
+        expect(gridScope.getExternalScope().click).toBeDefined();
+        expect(typeof gridScope.getExternalScope().click).toBe('function');
+
+        expect(gridScope.getExternalScope().value).toBe(2);
+    });
+
+    it('m-grid external scope event with custom scope object', function () {
+        var $scope = $rootScope.$new();
+        $scope.gridOptions = {
+            columns: [],
+            externalScope: 'myScope'
+        };
+        var element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
+        $scope.$digest();
+
+        var gridScope = element.isolateScope();
+        expect(gridScope.getExternalScope()).toBeDefined();
+        expect(gridScope.getExternalScope().click).toBeUndefined();
+
+        $scope.myScope = {
+            click: function () {},
+            value: 2
+        };
+
+        expect(gridScope.getExternalScope().click).toBeDefined();
+        expect(typeof gridScope.getExternalScope().click).toBe('function');
+
+        expect(gridScope.getExternalScope().value).toBe(2);
+    });
 });
