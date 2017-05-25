@@ -27,7 +27,7 @@ describe('m-grid.service', function () {
         };
         var template = mGridService.getGridTemplate(gridOptions, mGridConfig);
 
-        expect(template).toBe('<div style="overflow-x:auto;width: 100%;"><table class="my-table-class"><thead><tr><th ng-repeat="column in gridOptions.columns" class="my-th-class"><span ng-bind="column.name">Name</a></th></tr></thead><tbody><tr ng-repeat="item in gridOptions.data"><td><span ng-bind="item[\'id\']"></span></td><td><span ng-bind="item[\'column1\']"></span></td></tr></tbody></thead></table></div>');
+        expect(template).toBe('<div style="overflow-x:auto;width: 100%;"><table class="my-table-class"><thead><tr><th ng-repeat="column in gridOptions.columns" class="my-th-class"><a href="" ng-click="order(column.field, (column.sorting !== undefined ? column.sorting : gridOptions.sorting))" ng-bind="column.name">Name</a><span class="m-grid-sortorder" ng-show="predicate === column.field" ng-class="{\'m-grid-sortorder-reverse\':reverse}"></span></th></tr></thead><tbody><tr ng-repeat="item in getData()"><td><span ng-bind="item[\'id\']"></span></td><td><span ng-bind="item[\'column1\']"></span></td></tr></tbody></thead></table></div>');
     });
 
     it('m-grid.service getCellTemplate', function () {
