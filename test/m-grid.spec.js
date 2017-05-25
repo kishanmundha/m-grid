@@ -99,4 +99,57 @@ describe('m-grid.directive', function () {
 
         expect(gridScope.getExternalScope().value).toBe(2);
     });
+
+    it('m-grid sorting', function () {
+        var gridScope, element;
+
+        var $scope = $rootScope.$new();
+        $scope.gridOptions = {
+            columns: [{
+                name: '#',
+                field: 'id'
+            }, {
+                name: 'No sort',
+                field: 'nosort',
+                sorting: false
+            }],
+            externalScope: 'myScope',
+            sorting: true,
+            defaultSorting: 'id'
+        };
+
+        element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
+        $scope.$digest();
+
+        gridScope = element.isolateScope();
+
+        expect(gridScope.predicate).toBe('id');
+        expect(gridScope.reverse).toBe(false);
+
+        $scope.gridOptions.defaultSorting = '-id';
+
+        element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
+        $scope.$digest();
+
+        gridScope = element.isolateScope();
+        expect(gridScope.predicate).toBe('id');
+        expect(gridScope.reverse).toBe(true);
+
+        gridScope.order('nosort', false);
+        expect(gridScope.predicate).not.toBe('nosort');
+
+        expect(gridScope.getData()).toEqual([]);
+
+        $scope.gridOptions.data = [{id: 2}, {id: 1}, {id: 5}];
+
+        gridScope.predicate = '';
+        gridScope.reverse = false;
+        expect(gridScope.getData()).toEqual([{id: 2}, {id: 1}, {id: 5}]);
+
+        gridScope.order('id', true);
+        expect(gridScope.getData()).toEqual([{id: 1}, {id: 2}, {id: 5}]);
+
+        gridScope.order('id', true);
+        expect(gridScope.getData()).toEqual([{id: 5}, {id: 2}, {id: 1}]);
+    });
 });

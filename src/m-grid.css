@@ -1,3 +1,16 @@
 .m-grid-th {
     text-transform: capitalize;
 }
+
+.m-grid-th a {
+    text-decoration: none;
+    color: #333;
+}
+
+.m-grid-sortorder::after {
+    content: '\25b2';
+}
+
+.m-grid-sortorder-reverse::after {
+    content: '\25bc';
+}

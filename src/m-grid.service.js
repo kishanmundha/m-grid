@@ -18,12 +18,13 @@ angular.module('m-grid.service', [])
         html += '<thead>';
         html += '<tr>';
         html += '<th ng-repeat="column in gridOptions.columns" class="' + mGridConfig.thClass + '">';
-        html += '<span ng-bind="column.name">Name</a>';
+        html += '<a href="" ng-click="order(column.field, (column.sorting !== undefined ? column.sorting : gridOptions.sorting))" ng-bind="column.name">Name</a>';
+        html += '<span class="m-grid-sortorder" ng-show="predicate === column.field" ng-class="{\'m-grid-sortorder-reverse\':reverse}"></span>';
         html += '</th>';
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
-        html += '<tr ng-repeat="item in gridOptions.data">';
+        html += '<tr ng-repeat="item in getData()">';
 
         angular.forEach(gridOptions.columns, function (item) {
             html += getCellTemplate(item);
