@@ -14,7 +14,10 @@ describe('m-grid.directive', function () {
     beforeEach(module('m-grid', function ($provide) {
         $provide.value('mGridService', {
             getGridTemplate: function (gridOptions, mGridConfig) {
-                return '<div>m-grid</div>';
+                return '<div><table><tbody><tr></tr></tbody></table></div>';
+            },
+            getBodyTemplate: function (gridOptions, mGridConfig) {
+                return '<tr><td>new template</td></tr>';
             }
         });
     }));
@@ -50,7 +53,13 @@ describe('m-grid.directive', function () {
         };
         var element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
         $scope.$digest();
-        expect(element.html()).toContain('<div class="ng-scope">m-grid</div>');
+        expect(element.html()).toContain('<div class="ng-scope"><table><tbody><tr></tr></tbody></table></div>');
+
+        $scope.gridOptions.refresh();
+        expect(element.html()).toContain('<div class="ng-scope"><table><tbody><tr class="ng-scope"><td>new template</td></tr></tbody></table></div>');
+
+        $scope.gridOptions.refresh(true);
+        expect(element.html()).toContain('<div class="ng-scope"><table><tbody><tr></tr></tbody></table></div>');
     });
 
     it('m-grid external scope event', function () {
