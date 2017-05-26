@@ -23,7 +23,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
         (function () {
             var html = mGridService.getGridTemplate($scope.gridOptions, mGridConfig);
 
-            element.append(html);
+            element.html(html);
 
             $compile(element.contents())($scope);
         })();
@@ -56,6 +56,22 @@ angular.module('m-grid.directive', ['m-grid.config'])
             return _getSortedData();
         };
 
+        /**
+         * Recompile grid when some column level property change
+         * @param {Boolean} force flag for recompile force fully grid
+         */
+        $scope.recompile = function (force) {
+            if (force) {
+                var html = mGridService.getGridTemplate($scope.gridOptions, mGridConfig);
+                element.html(html);
+                $compile(element.contents())($scope);
+            } else {
+                var tbody = element.find('tbody');
+                tbody.html(mGridService.getBodyTemplate($scope.gridOptions, mGridConfig));
+                $compile(tbody.contents())($scope);
+            }
+        };
+
         /***********************************************
          * Helper functions
          **********************************************/
@@ -73,6 +89,12 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
             return data;
         };
+
+        /***********************************************
+         * Export methods
+         **********************************************/
+
+        $scope.gridOptions.refresh = $scope.recompile;  // refresh grid
 
         /***********************************************
          * Final execution
