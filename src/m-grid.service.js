@@ -28,6 +28,11 @@ angular.module('m-grid.service', [])
         html += '</tbody>';
         html += '</thead>';
         html += '</table>';
+
+        if (gridOptions.disablePagination !== true) {
+            html += getPaginationTemplate(gridOptions, mGridConfig);
+        }
+
         html += '</div>';
 
         return html;
@@ -76,12 +81,38 @@ angular.module('m-grid.service', [])
 
         bodyTemplate += '</tr>';
 
+        bodyTemplate += '<tr ng-show="getRecordCount() == 0"><td colspan="' + gridOptions.columns.length + '"><div style="text-align:center; margin: 20px auto 20px;"><h3>No record found</h3></div></td></tr>';
+
         return bodyTemplate;
+    }
+
+    /**
+     * Generate pagination template
+     * @param {*} gridOptions
+     * @param {*} mGridConfig
+     * @return {String} pagination template
+     */
+    function getPaginationTemplate (gridOptions, mGridConfig) {
+        var html = '';
+        html += '<div ng-hide="getRecordCount() == 0" class="panel-footer ' + mGridConfig.footerClass + '">';
+        html += '<m-grid-pagination class="pull-left" style="margin: 0px;" total-items="getRecordCount()" max-size="3" ng-model="currentPage" items-per-page="displayLimit" rotate="false" ng-change="currentPageChange()"></m-grid-pagination>';
+        html += '<div class="pull-left" style=" margin-left: 10px;">';
+        html += '<select class="form-control input-sm hidden-xs" style="display:inline-block; width: 70px; height: 29px;" type="text" ng-model="displayLimit" ng-options="o.value as o.text for o in displayLimitOptions"></select>';
+        html += '<span class="hidden-xs"> items per page</span>';
+        html += '<span ng-if="gridData.loading && !gridData.loadingFull && gridData.firstLoaded" style="display:inline-block; vertical-align: middle; margin-left: 10px; height:22px;">';
+        html += '<progress-circular size="sm"></progress-circular>';
+        html += '</span>';
+        html += '</div>';
+        html += '<div class="pull-right hidden-xs" ng-bind="getStatusString()" style="margin-top:5px;"></div>';
+        html += '<div class="clearfix"></div>';
+        html += '</div>';
+        return html;
     }
 
     return {
         getGridTemplate: getGridTemplate,
         getCellTemplate: getCellTemplate,
-        getBodyTemplate: getBodyTemplate
+        getBodyTemplate: getBodyTemplate,
+        getPaginationTemplate: getPaginationTemplate
     };
 }]);

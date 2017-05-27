@@ -1,3 +1,11 @@
+.m-grid {
+    margin-bottom: 20px;
+}
+
+.m-grid-table {
+    margin-bottom: 0px;
+}
+
 .m-grid-th {
     text-transform: capitalize;
 }
@@ -13,4 +21,9 @@
 
 .m-grid-sortorder-reverse::after {
     content: '\25bc';
+}
+
+.m-grid-footer {
+    border: 1px solid #ddd;
+    border-top-width: 0px;
 }
