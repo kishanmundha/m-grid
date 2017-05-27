@@ -60,16 +60,16 @@
                     name: 'Full name',
                     field: 'fullName'
                 }, {
-                    name: 'Action',
-                    field: 'email',
-                    cellTemplate: '<button class="btn btn-default btn-xs" type="button" ng-click="getExternalScope().sendMail(item.email)"><span class="glyphicon glyphicon-share-alt"></span> <span>Send email</span></button>'
+                    name: 'Email',
+                    field: 'email'
                 }],
-                disablePagination: true
+                sorting: true,
+                defaultSorting: 'id'
             };
 
             var data = [];
 
-            for (var i = 0; i < 10; i++) {
+            for (var i = 0; i < 105; i++) {
                 data.push({
                     id: (i + 1),
                     fullName: 'Name ' + (i + 1),
@@ -78,12 +78,6 @@
             }
 
             $scope.gridOptions.data = data;
-
-            $scope.states = {
-                sendMail: function(email) {
-                    alert('Mail sent to ' + email);
-                }
-            }
         })
     </script>
 
@@ -105,15 +99,16 @@ app.controller('appCtrl', function($scope) {
             name: 'Full name',
             field: 'fullName'
         }, {
-            name: 'Action',
-            field: 'email',
-            cellTemplate: '&lt;button class="btn btn-default btn-xs" type="button" ng-click="getExternalScope().sendMail(item.email)"&gt;&lt;span class="glyphicon glyphicon-share-alt"&gt;&lt;/span&gt; &lt;span&gt;Send email&lt;/span&gt;&lt;/button&gt;'
-        }]
+            name: 'Email',
+            field: 'email'
+        }],
+        sorting: true,
+        defaultSorting: 'id'
     };
 
     var data = [];
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 105; i++) {
         data.push({
             id: (i + 1),
             fullName: 'Name ' + (i + 1),
@@ -122,19 +117,12 @@ app.controller('appCtrl', function($scope) {
     }
 
     $scope.gridOptions.data = data;
-
-    $scope.states = {
-        sendMail: function(email) {
-            alert('Mail sent to ' + email);
-        }
-    }
 })
 &lt;/script&gt;
       </code>
     </pre>
-
     <div class="alert alert-info">
-        Default we get object from <code>states</code> property of <code>$scope</code>. If we want to use other property of <code>$scope</code>, We can pass property name in <code>gridOptions.externalScope</code>.
+        Pagination come with basic grid by default. To disable pagination use <code>gridOptions.disablePagination = true</code>
     </div>
     </div>
 

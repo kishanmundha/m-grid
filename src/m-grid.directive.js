@@ -18,6 +18,12 @@ angular.module('m-grid.directive', ['m-grid.config'])
         // local scope variables
         $scope.predicate = '';
         $scope.reverse = false;
+        $scope.displayLimitOptions = mGridConfig.displayLimitOptions;
+
+        // pagination option
+        $scope.startFrom = 0;
+        $scope.currentPage = 1;
+        $scope.displayLimit = 10;
 
         // compile html
         (function () {
@@ -49,11 +55,37 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
             $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
             $scope.predicate = predicate;
+
+            $scope.currentPage = 1;
+            $scope.currentPageChange();
+        };
+
+        // get conditionaly page count
+        $scope.getRecordCount = function () {
+            var count = 0;
+            count = _getSortedData().length;
+            return count;
         };
 
         // get conditionaly data
         $scope.getData = function () {
-            return _getSortedData();
+            var data = _getSortedData();
+            if ($scope.gridOptions.disablePagination !== true) {
+                data = _getSkippedData(data, $scope.startFrom);
+                data = _getLimitedData(data, $scope.displayLimit);
+            }
+            return data;
+        };
+
+        $scope.currentPageChange = function () {
+            $scope.startFrom = ($scope.currentPage - 1) * $scope.displayLimit;
+        };
+
+        $scope.getStatusString = function () {
+            // 1 - 10 of 327 items
+            var len = $scope.getRecordCount();
+
+            return ($scope.startFrom + 1) + ' - ' + Math.min(($scope.startFrom + $scope.displayLimit), len) + ' of ' + len + ' items';
         };
 
         /**
@@ -90,6 +122,14 @@ angular.module('m-grid.directive', ['m-grid.config'])
             return data;
         };
 
+        var _getSkippedData = function (data, skip) {
+            return $filter('mGridStartFrom')(data, skip);
+        };
+
+        var _getLimitedData = function (data, limit) {
+            return $filter('limitTo')(data, limit);
+        };
+
         /***********************************************
          * Export methods
          **********************************************/
@@ -119,7 +159,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
         },
         replace: true,
         restrict: 'E',
-        template: '<div></div>',
+        template: '<div class="m-grid"></div>',
         link: linkFn
     };
 }]);
