@@ -2,7 +2,7 @@
 
 angular.module('m-grid.directive', ['m-grid.config'])
 
-.directive('mGrid', ['$log', '$compile', '$filter', 'mGridConfig', 'mGridService', function ($log, $compile, $filter, mGridConfig, mGridService) {
+.directive('mGrid', ['$log', '$compile', '$filter', '$timeout', 'mGridConfig', 'mGridService', function ($log, $compile, $filter, $timeout, mGridConfig, mGridService) {
     /**
      * Link function for directive
      * @param {*} scope
@@ -15,6 +15,11 @@ angular.module('m-grid.directive', ['m-grid.config'])
             throw new Error('mGrid must configure gridOptions and there columns');
         }
 
+        // local variables
+        var searchTimer;
+        var globalSearch = $scope.gridOptions.globalSearch || mGridConfig.globalSearch || 'globalSearch';
+        var globalSearchListener;
+
         // local scope variables
         $scope.predicate = '';
         $scope.reverse = false;
@@ -24,6 +29,30 @@ angular.module('m-grid.directive', ['m-grid.config'])
         $scope.startFrom = 0;
         $scope.currentPage = 1;
         $scope.displayLimit = 10;
+
+        /***********************************************
+         * Initilization
+         **********************************************/
+
+        if ($scope.gridOptions.enableSearch) {
+            // watch for search only if we want to enable search
+            // increasing watcher decrease performance
+            // we only use watcher if we need
+            globalSearchListener = $scope.$on(globalSearch, function (event, value) {
+                _search(value);
+            });
+
+            var gridSearchWatch = $scope.$watch('gridOptions.search', function (newValue, oldValue) {
+                _search(newValue);
+            });
+        }
+
+        $scope.$on('$destroy', function () {
+            if ($scope.gridOptions.enableSearch) {
+                globalSearchListener();
+                gridSearchWatch();
+            }
+        });
 
         // compile html
         (function () {
@@ -62,18 +91,32 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         // get conditionaly page count
         $scope.getRecordCount = function () {
-            var count = 0;
-            count = _getSortedData().length;
-            return count;
+            var data = $scope.gridOptions.data || [];
+
+            if ($scope.gridOptions.enableSearch === true) {
+                data = _getFilteredData(data, $scope.search);
+            }
+
+            return data.length;
         };
 
         // get conditionaly data
         $scope.getData = function () {
-            var data = _getSortedData();
+            var data = $scope.gridOptions.data || [];
+
+            if ($scope.gridOptions.enableSearch === true) {
+                data = _getFilteredData(data, $scope.search);
+            }
+
+            if ($scope.predicate) {
+                data = _getSortedData(data, $scope.predicate, $scope.reverse);
+            }
+
             if ($scope.gridOptions.disablePagination !== true) {
                 data = _getSkippedData(data, $scope.startFrom);
                 data = _getLimitedData(data, $scope.displayLimit);
             }
+
             return data;
         };
 
@@ -109,17 +152,26 @@ angular.module('m-grid.directive', ['m-grid.config'])
          **********************************************/
 
         /**
+         * Update search term
+         */
+        var _search = function (value) {
+            $timeout.cancel(searchTimer);
+
+            // search on finish typing
+            searchTimer = $timeout(function () {
+                if ($scope.search !== value) {
+                    $scope.search = value;
+                    // refreshAjaxData();
+                }
+            }, 500);
+        };
+
+        /**
          * Get sorted data
          * @return {any[]}
          */
-        var _getSortedData = function () {
-            var data = $scope.gridOptions.data || [];
-
-            if ($scope.predicate) {
-                data = $filter('orderBy')(data, $scope.predicate, $scope.reverse);
-            }
-
-            return data;
+        var _getSortedData = function (data, predicate, reverse) {
+            return $filter('orderBy')(data, predicate, reverse);
         };
 
         var _getSkippedData = function (data, skip) {
@@ -128,6 +180,10 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         var _getLimitedData = function (data, limit) {
             return $filter('limitTo')(data, limit);
+        };
+
+        var _getFilteredData = function (data, search) {
+            return $filter('filter')(data, search);
         };
 
         /***********************************************

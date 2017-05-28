@@ -9,7 +9,7 @@ describe('Basic unit test describe', function () {
 });
 
 describe('m-grid.directive', function () {
-    var $compile, $rootScope;
+    var $compile, $rootScope, $timeout;
 
     beforeEach(module('m-grid', function ($provide) {
         $provide.value('mGridService', {
@@ -22,9 +22,10 @@ describe('m-grid.directive', function () {
         });
     }));
 
-    beforeEach(inject(function (_$compile_, _$rootScope_) {
+    beforeEach(inject(function (_$compile_, _$rootScope_, _$timeout_) {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
+        $timeout = _$timeout_;
     }));
 
     it('m-grid without grid options', function () {
@@ -60,6 +61,9 @@ describe('m-grid.directive', function () {
 
         $scope.gridOptions.refresh(true);
         expect(element.html()).toContain('<div class="ng-scope"><table><tbody><tr></tr></tbody></table></div>');
+
+        var gridScope = element.isolateScope();
+        gridScope.$destroy();
     });
 
     it('m-grid external scope event', function () {
@@ -147,6 +151,7 @@ describe('m-grid.directive', function () {
         gridScope.order('nosort', false);
         expect(gridScope.predicate).not.toBe('nosort');
 
+        expect(gridScope.getRecordCount()).toEqual(0);
         expect(gridScope.getData()).toEqual([]);
 
         $scope.gridOptions.data = [{id: 2}, {id: 1}, {id: 5}];
@@ -160,5 +165,63 @@ describe('m-grid.directive', function () {
 
         gridScope.order('id', true);
         expect(gridScope.getData()).toEqual([{id: 5}, {id: 2}, {id: 1}]);
+    });
+
+    it('m-grid search', function () {
+        var gridScope, element;
+
+        var $scope = $rootScope.$new();
+        $scope.gridOptions = {
+            columns: [{
+                name: '#',
+                field: 'id'
+            }, {
+                name: 'No sort',
+                field: 'nosort',
+                sorting: false
+            }],
+            externalScope: 'myScope',
+            sorting: true,
+            defaultSorting: 'id',
+            disablePagination: true,
+            enableSearch: true
+        };
+
+        element = $compile('<m-grid grid-options="gridOptions"></m-grid>')($scope);
+        $scope.$digest();
+
+        gridScope = element.isolateScope();
+
+        $scope.gridOptions.data = [{id: 2}, {id: 1}, {id: 5}];
+
+        expect(gridScope.getRecordCount()).toBe(3);
+
+        $scope.gridOptions.search = '5';
+        $scope.$digest();
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
+        expect(gridScope.search).toBe('5');
+        expect(gridScope.getRecordCount()).toBe(1);
+        expect(gridScope.getData()).toEqual([{id: 5}]);
+
+        $scope.gridOptions.search = '6';
+        $scope.$digest();
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
+        expect(gridScope.search).toBe('6');
+
+        $rootScope.$broadcast('globalSearch', '5');
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
+        expect(gridScope.search).toBe('5');
+
+        $rootScope.$broadcast('globalSearch', '5');
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
+        expect(gridScope.search).toBe('5');
+
+        expect(gridScope.getStatusString()).toBe('1 - 1 of 1 items');
+
+        gridScope.$destroy();
     });
 });

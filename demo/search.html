@@ -1,0 +1,175 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+
+    <link rel="stylesheet" href="../src/m-grid.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+
+    <script src="../src/m-grid.module.js"></script>
+    <script src="../src/m-grid.config.js"></script>
+    <script src="../src/m-grid.service.js"></script>
+    <script src="../src/m-grid.directive.js"></script>
+    <script src="../src/m-grid.pagination.js"></script>
+    <script src="../src/m-grid.start-from.filter.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/vs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+
+    <style>
+        html,
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            height: 100%;
+            font-size: 13px;
+        }
+
+        table {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="app" ng-controller="appCtrl">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="pull-right" style="padding: 8px; padding-right: 0px;"><input class="form-control" placeholder="Global search" ng-model="globalSearchTerm" ng-change="globalSearch(globalSearchTerm)" /></div>
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">m-grid</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="pull-right"><input class="form-control" placeholder="Search" ng-model="localSearchTerm" ng-change="localsearch(localSearchTerm)" /></div>
+            <div class="clearfix"></div>
+            <br/>
+            <m-grid grid-options="gridOptions"></m-grid>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('app', ['m-grid']);
+
+        app.controller('appCtrl', function ($scope, $rootScope) {
+            $scope.gridOptions = {
+                columns: [{
+                    name: '#',
+                    field: 'id'
+                }, {
+                    name: 'Full name',
+                    field: 'fullName'
+                }, {
+                    name: 'Email',
+                    field: 'email'
+                }],
+                sorting: true,
+                defaultSorting: 'id',
+                enableSearch: true
+            };
+
+            var data = [];
+
+            for (var i = 0; i < 105; i++) {
+                data.push({
+                    id: (i + 1),
+                    fullName: 'Name ' + (i + 1),
+                    email: 'email' + (i + 1) + '@test.com'
+                })
+            }
+
+            $scope.gridOptions.data = data;
+
+            $scope.globalSearch = function(search) {
+                $rootScope.$broadcast('globalSearch', search);
+            };
+
+            $scope.localsearch = function(search) {
+                $scope.gridOptions.search = search;
+            }
+        })
+    </script>
+
+    <div class="container">
+        <h3>Code</h3>
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="html">
+&lt;div ng-app="app" ng-controller="appCtrl"&gt;
+    &lt;nav class="navbar navbar-default"&gt;
+        &lt;div class="container-fluid"&gt;
+            &lt;div class="pull-right" style="padding: 8px; padding-right: 0px;"&gt;&lt;input class="form-control" placeholder="Global search" ng-model="globalSearchTerm" ng-change="globalSearch(globalSearchTerm)" /&gt;&lt;/div&gt;
+            &lt;div class="navbar-header"&gt;
+                &lt;a class="navbar-brand" href="index.html"&gt;m-grid&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;div class="container"&gt;
+        &lt;div class="pull-right"&gt;&lt;input class="form-control" placeholder="Search" ng-model="localSearchTerm" ng-change="localsearch(localSearchTerm)" /&gt;&lt;/div&gt;
+        &lt;div class="clearfix"&gt;&lt;/div&gt;
+        &lt;br/&gt;
+        &lt;m-grid grid-options="gridOptions"&gt;&lt;/m-grid&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;script&gt;
+var app = angular.module('app', ['ui.bootstrap', 'm-grid']);
+
+app.controller('appCtrl', function ($scope, $rootScope) {
+    $scope.gridOptions = {
+        columns: [{
+            name: '#',
+            field: 'id'
+        }, {
+            name: 'Full name',
+            field: 'fullName'
+        }, {
+            name: 'Email',
+            field: 'email'
+        }],
+        sorting: true,
+        defaultSorting: 'id',
+        enableSearch: true
+    };
+
+    var data = [];
+
+    for (var i = 0; i < 105; i++) {
+        data.push({
+            id: (i + 1),
+            fullName: 'Name ' + (i + 1),
+            email: 'email' + (i + 1) + '@test.com'
+        })
+    }
+
+    $scope.gridOptions.data = data;
+
+    $scope.globalSearch = function(search) {
+        $rootScope.$broadcast('globalSearch', search);
+    };
+
+    $scope.localsearch = function(search) {
+        $scope.gridOptions.search = search;
+    }
+})
+&lt;/script&gt;
+      </code>
+    </pre>
+    <div class="alert alert-info">
+        We can enable search by two way
+        <ul>
+            <li>Global search : A global search box present in all page and a broadcast method update globa search value</li>
+            <li>Local search : Search box on only perticular page. Set <code>gridOptions.search</code> when search model value change.</li>
+        </ul>
+    </div>
+    </div>
+
+</body>
+
+</html>
