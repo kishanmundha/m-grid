@@ -79,7 +79,7 @@ describe('m-grid.service', function () {
         expect(template).toBe('<td ng-style="{\'text-align\':\'left\',\'display\':\'none\'}"><span ng-bind="item[\'price\'] | currency"></span></td>');
     });
 
-    it('', function () {
+    it('m-grid.service pagination', function () {
         var gridOptions = {
             columns: [{
                 name: '#',
