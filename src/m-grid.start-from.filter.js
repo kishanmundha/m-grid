@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('m-grid.start-from.filter', [])
 
 .filter('mGridStartFrom', function () {
