@@ -3,3 +3,4 @@ npm-debug.log
 coverage/
 typings/
 bower_components/
+dist/

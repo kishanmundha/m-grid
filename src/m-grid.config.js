@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('m-grid.config', [])
 
 .constant('mGridConfig', {

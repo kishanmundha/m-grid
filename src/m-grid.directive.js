@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('m-grid.directive', ['m-grid.config'])
 
 .directive('mGrid', ['$log', '$compile', '$filter', '$timeout', 'mGridConfig', 'mGridService', function ($log, $compile, $filter, $timeout, mGridConfig, mGridService) {
