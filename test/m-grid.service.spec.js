@@ -40,7 +40,11 @@ describe('m-grid.service', function () {
 
         var template = mGridService.getCellTemplate(column);
 
-        expect(template).toBe('<td><div ng-init="row={\'entity\':item}"><span>my-custom-template</span></div></td>');
+        expect(template).toBe('<td><div><span>my-custom-template</span></div></td>');
+
+        var templateWithAlias = mGridService.getCellTemplate(column, 'test');
+
+        expect(templateWithAlias).toBe('<td><div ng-init="test=item"><span>my-custom-template</span></div></td>');
     });
 
     it('m-grid.service getCellTemplate cell text format', function () {
