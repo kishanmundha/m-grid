@@ -42,7 +42,7 @@ angular.module('m-grid.service', [])
      * @param {*} column
      * @return {String} Cell template
      */
-    function getCellTemplate (column) {
+    function getCellTemplate (column, rowItemAlias) {
         var cellStyle = '';
 
         if (column.style) {
@@ -53,7 +53,11 @@ angular.module('m-grid.service', [])
         var cellTemplate = '<td' + cellStyle + '>';
 
         if (column.cellTemplate) {
-            cellTemplate += '<div ng-init="row={\'entity\':item}">' + column.cellTemplate + '</div>';
+            if (rowItemAlias) {
+                cellTemplate += '<div ng-init="' + rowItemAlias + '=item">' + column.cellTemplate + '</div>';
+            } else {
+                cellTemplate += '<div>' + column.cellTemplate + '</div>';
+            }
         } else {
             cellTemplate += '<span ng-bind="item[\'' + column.field + '\']' + (column.format ? ' | ' + column.format : '') + '"></span>';
         }
@@ -74,7 +78,7 @@ angular.module('m-grid.service', [])
         bodyTemplate += '<tr ng-repeat="item in getData()">';
 
         angular.forEach(gridOptions.columns, function (item) {
-            bodyTemplate += getCellTemplate(item);
+            bodyTemplate += getCellTemplate(item, gridOptions.rowItemAlias);
         });
 
         bodyTemplate += '</tr>';

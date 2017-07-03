@@ -11,7 +11,7 @@ var concatCSS = require('gulp-concat-css');
 var cleanCSS = require('gulp-clean-css');
 
 gulp.task('test:lint', function (done) {
-    return gulp.src(['**/*.js', '!node_modules/**', '!coverage/**'])
+    return gulp.src(['**/*.js', '!node_modules/**', '!coverage/**', '!dist/**'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());

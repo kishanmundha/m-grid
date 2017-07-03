@@ -64,8 +64,9 @@
                 }, {
                     name: 'Email',
                     field: 'email',
-                    cellTemplate: '<span class="glyphicon glyphicon-share-alt"></span><span>{{item.email}}</span>'
+                    cellTemplate: '<span class="glyphicon glyphicon-share-alt"></span><span>{{user.email}}</span>'
                 }],
+                rowItemAlias: 'user',
                 disablePagination: true
             };
 
@@ -106,7 +107,9 @@ app.controller('appCtrl', function($scope) {
             name: 'Email',
             field: 'email',
             cellTemplate: '&lt;span class="glyphicon glyphicon-share-alt"&gt;&lt;/span&gt;&lt;span&gt;{{item.email}}&lt;/span&gt;'
-        }]
+        }],
+        rowItemAlias: 'user',
+        disablePagination: true
     }
 
     var data = [];
@@ -125,7 +128,7 @@ app.controller('appCtrl', function($scope) {
       </code>
     </pre>
 
-    <blockquote>We can access current cell data by using <code>{{item}}</blockquote>
+    <blockquote>We can access current cell data by using <code>{{item}}</code> or <code>{{rowItemAlias}}</code></blockquote>
     </div>
 
 </body>
