@@ -20,8 +20,7 @@ gulp.task('test:lint', function (done) {
 gulp.task('test:karma', function (done) {
     console.log(path.join(__dirname, '/karma.conf.js'));
     new Server({
-        configFile: path.join(__dirname, '/karma.conf.js'),
-        singleRun: true
+        configFile: path.join(__dirname, '/karma.conf.js')
     }, done).start();
 });
 

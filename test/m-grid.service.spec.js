@@ -28,7 +28,7 @@ describe('m-grid.service', function () {
         };
         var template = mGridService.getGridTemplate(gridOptions, mGridConfig);
 
-        expect(template).toBe('<div style="overflow-x:auto;width: 100%;"><table class="my-table-class"><thead><tr><th ng-repeat="column in gridOptions.columns" class="my-th-class" ng-style="{\'width\':column.style.width||\'auto\',\'min-width\':column.style.minWidth||\'auto\',\'text-align\':column.style.textAlign||\'left\',\'display\':(column.style.visible!==false?\'table-cell\':\'none\')}"><a href="" ng-click="order(column.field, (column.sorting !== undefined ? column.sorting : gridOptions.sorting))" ng-bind="column.name">Name</a><span class="m-grid-sortorder" ng-show="predicate === column.field" ng-class="{\'m-grid-sortorder-reverse\':reverse}"></span></th></tr></thead><tbody><tr ng-repeat="item in getData()"><td><span ng-bind="item[\'id\']"></span></td><td><span ng-bind="item[\'column1\']"></span></td></tr><tr ng-show="getRecordCount() == 0"><td colspan="2"><div style="text-align:center; margin: 20px auto 20px;"><h3>No record found</h3></div></td></tr></tbody></thead></table></div>');
+        expect(template).toBe('<div style="overflow-x:auto;width: 100%;"><table class="my-table-class"><thead><tr><th ng-repeat="column in gridOptions.columns" class="my-th-class" ng-style="{\'width\':column.style.width||\'auto\',\'min-width\':column.style.minWidth||\'auto\',\'text-align\':column.style.textAlign||\'left\',\'display\':(column.style.visible!==false?\'table-cell\':\'none\')}"><a href="" ng-click="order(column.field, (column.sorting !== undefined ? column.sorting : gridOptions.sorting))" ng-bind="column.name">Name</a><span class="m-grid-sortorder" ng-show="predicate === column.field" ng-class="{\'m-grid-sortorder-reverse\':reverse}"></span></th></tr></thead><tbody ng-hide="gridData.loading && gridData.loadingFull"><tr ng-repeat="item in getData()"><td><span ng-bind="item[\'id\']"></span></td><td><span ng-bind="item[\'column1\']"></span></td></tr><tr ng-show="getRecordCount() == 0 && (!gridOptions.async || gridData.firstLoaded)"><td colspan="2"><div style="text-align:center; margin: 20px auto 20px;"><h3>No record found</h3></div></td></tr></tbody><tbody><tr ng-show="gridOptions.async && ((gridData.loading && gridData.loadingFull) || !gridData.firstLoaded)"><td colspan="2" style="text-align:center; margin: 20px auto 10px;"><progress-circular></progress-circular></td></tr></tbody></table></div>');
     });
 
     it('m-grid.service getCellTemplate', function () {
@@ -98,6 +98,6 @@ describe('m-grid.service', function () {
 
         var template = mGridService.getGridTemplate(gridOptions, mGridConfig);
 
-        expect(template.indexOf('<div ng-hide="getRecordCount() == 0" class="panel-footer') !== -1).toBe(true);
+        expect(template.indexOf('<div ng-hide="getRecordCount() == 0 || (gridData.loading && gridData.loadingFull)" class="panel-footer') !== -1).toBe(true);
     });
 });

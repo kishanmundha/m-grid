@@ -27,3 +27,51 @@
     border: 1px solid #ddd;
     border-top-width: 0px;
 }
+
+@keyframes m-grid-progress-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@keyframes m-grid-progress-dash {
+    0% {
+        stroke-dasharray: 1,500;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 89,500;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 89,500;
+        stroke-dashoffset: -124;
+    }
+}
+@keyframes m-grid-progress-dash-sm {
+    0% {
+        stroke-dasharray: 1,500;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 44,500;
+        stroke-dashoffset: -17;
+    }
+    100% {
+        stroke-dasharray: 44,500;
+        stroke-dashoffset: -61;
+    }
+}
+@keyframes m-grid-progress-color {
+    100%, 0% {
+        stroke: #d62d20;
+    }
+    40% {
+        stroke: #0057e7;
+    }
+    66% {
+        stroke: #008744;
+    }
+    80%, 90% {
+        stroke: #ffa700;
+    }
+}
