@@ -6,7 +6,7 @@
 
     <link rel="stylesheet" href="../src/m-grid.css" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.5/angular.min.js"></script>
 
     <script src="../src/m-grid.module.js"></script>
     <script src="../src/m-grid.config.js"></script>
@@ -46,13 +46,17 @@
     </nav>
 
     <div ng-app="app" ng-controller="appCtrl" class="container">
+        <div class="pull-right"><input class="form-control" placeholder="Search" ng-model="gridOptions.search" /></div>
+        <div class="clearfix"></div>
+        <br/>
         <m-grid grid-options="gridOptions"></m-grid>
     </div>
 
     <script>
         var app = angular.module('app', ['m-grid']);
 
-        app.controller('appCtrl', function ($scope) {
+        app.controller('appCtrl', function ($scope, $q) {
+            window['q'] = $q;
             $scope.gridOptions = {
                 columns: [{
                     name: '#',
@@ -61,29 +65,45 @@
                     name: 'Full name',
                     field: 'fullName'
                 }, {
-                    name: 'Action',
-                    field: 'email',
-                    cellTemplate: '<button class="btn btn-default btn-xs" type="button" ng-click="getExternalScope().sendMail(item.email)"><span class="glyphicon glyphicon-share-alt"></span> <span>Send email</span></button>'
+                    name: 'Email',
+                    field: 'email'
                 }],
-                disablePagination: true
+                sorting: true,
+                defaultSorting: 'id',
+                async: true,
+                asyncData: function(options) {
+                    return new Promise(function(resolve, reject) {
+                        var d = Array.prototype.concat([], data);
+                        d = d.filter(function(item) {
+                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                        }).slice(options.skip, options.take + options.skip)
+                        setTimeout(function() {
+                            resolve(d);
+                        }, 1000);
+                    })
+                },
+                asyncDataCount:  function(options) {
+                    return new Promise(function(resolve, reject) {
+                        var d = Array.prototype.concat([], data);
+                        d = d.filter(function(item) {
+                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                        })
+                        setTimeout(function() {
+                            resolve(d.length);
+                        }, 1000);
+                    })
+                },
+                enableSearch: true
             };
 
             var data = [];
 
-            for (var i = 0; i < 10; i++) {
+            for (var i = 0; i < 105; i++) {
                 data.push({
                     id: (i + 1),
                     fullName: 'Name ' + (i + 1),
                     email: 'email' + (i + 1) + '@test.com'
                 })
-            }
-
-            $scope.gridOptions.data = data;
-
-            $scope.states = {
-                sendMail: function(email) {
-                    alert('Mail sent to ' + email);
-                }
             }
         })
     </script>
@@ -106,36 +126,35 @@ app.controller('appCtrl', function($scope) {
             name: 'Full name',
             field: 'fullName'
         }, {
-            name: 'Action',
-            field: 'email',
-            cellTemplate: '&lt;button class="btn btn-default btn-xs" type="button" ng-click="getExternalScope().sendMail(item.email)"&gt;&lt;span class="glyphicon glyphicon-share-alt"&gt;&lt;/span&gt; &lt;span&gt;Send email&lt;/span&gt;&lt;/button&gt;'
-        }]
-    };
-
-    var data = [];
-
-    for (var i = 0; i < 10; i++) {
-        data.push({
-            id: (i + 1),
-            fullName: 'Name ' + (i + 1),
-            email: 'email' + (i + 1) + '@test.com'
-        })
-    }
-
-    $scope.gridOptions.data = data;
-
-    $scope.states = {
-        sendMail: function(email) {
-            alert('Mail sent to ' + email);
+            name: 'Email',
+            field: 'email'
+        }],
+        sorting: true,
+        defaultSorting: 'id',
+        async: true,
+        asyncData: 'http://example.com/dataurl?term={term}&skip={skip}&take={take}&orderby={orderby}&flag={flag}',
+        asyncDataCount: 'http://example.com/dataurl?term={term}&orderby={orderby}&flag={flag}',
+        urlParams: {
+            flag: true
         }
-    }
+        enableSearch: true        
+    };
 })
 &lt;/script&gt;
       </code>
     </pre>
-
     <div class="alert alert-info">
-        Default we get object from <code>states</code> property of <code>$scope</code>. If we want to use other property of <code>$scope</code>, We can pass property name in <code>gridOptions.externalScope</code>.
+        <ul>
+            <li>
+                We can use a function who return a promise in <code>asyncData</code> and <code>asyncDataCount</code>.
+            </li>
+            <li>
+                <code>urlParams</code> is optional parameters for query
+            </li>
+            <li>
+                Internal query parameters is <code>term, orderby, skip, take, page, limit</code>
+            </li>
+        </ul>
     </div>
     </div>
 

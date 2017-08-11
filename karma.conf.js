@@ -4,6 +4,8 @@ var process = require('process');
 
 module.exports = function (config) {
     var sourcePreprocessors = ['coverage'];
+    var browsers = ['PhantomJS'];
+    var singleRun = true;
 
     var isDebug = function (argument) {
         return argument === '--debug';
@@ -11,9 +13,12 @@ module.exports = function (config) {
 
     if (process.argv.some(isDebug)) {
         sourcePreprocessors = [];
+        browsers = ['Chrome'];
+        singleRun = false;
     }
 
     config.set({
+        singleRun: singleRun,
         basePath: './',
         files: [
             'bower_components/angular/angular.js',
@@ -23,15 +28,25 @@ module.exports = function (config) {
         ],
         plugins: [
             'karma-phantomjs-launcher',
+            'karma-chrome-launcher',
             'karma-jasmine',
-            'karma-coverage'
+            'karma-coverage',
+            'karma-htmlfile-reporter'
         ],
         frameworks: ['jasmine'],
-        browsers: ['PhantomJS'],
+        browsers: browsers,
         preprocessors: {
             'src/**/*.js': sourcePreprocessors
         },
-        reporters: ['progress', 'coverage'],
+        reporters: ['progress', 'coverage', 'html'],
+        htmlReporter: {
+            outputFile: 'coverage/test-result.html',
+            pageTitle: 'Unit Tests',
+            subPageTitle: 'm-grid testing result',
+            groupSuites: true,
+            useCompactStyle: true,
+            useLegacyStyle: true
+        },
         coverageReporter: {
             type: 'lcov',
             dir: 'coverage'

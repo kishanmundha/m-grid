@@ -1,6 +1,6 @@
 angular.module('m-grid.directive', ['m-grid.config'])
 
-.directive('mGrid', ['$log', '$compile', '$filter', '$timeout', 'mGridConfig', 'mGridService', function ($log, $compile, $filter, $timeout, mGridConfig, mGridService) {
+.directive('mGrid', ['$log', '$compile', '$filter', '$timeout', '$http', '$q', 'mGridConfig', 'mGridService', function ($log, $compile, $filter, $timeout, $http, $q, mGridConfig, mGridService) {
     /**
      * Link function for directive
      * @param {*} scope
@@ -17,6 +17,9 @@ angular.module('m-grid.directive', ['m-grid.config'])
         var searchTimer;
         var globalSearch = $scope.gridOptions.globalSearch || mGridConfig.globalSearch || 'globalSearch';
         var globalSearchListener;
+        var enableWatchEvent = false;
+        var forceApplyPromise;
+        var oldDisplayLimit = 10;
 
         // local scope variables
         $scope.predicate = '';
@@ -27,6 +30,15 @@ angular.module('m-grid.directive', ['m-grid.config'])
         $scope.startFrom = 0;
         $scope.currentPage = 1;
         $scope.displayLimit = 10;
+
+        // options for async loading data
+        $scope.gridData = {
+            data: [], // data
+            total: 0, // total record
+            loading: false, // is we are fetching data from xhr request
+            loadingFull: false, // only fetching a page. We show a small loding image in side of pagination control if we are not loading full
+            firstLoaded: false
+        };
 
         /***********************************************
          * Initilization
@@ -45,11 +57,22 @@ angular.module('m-grid.directive', ['m-grid.config'])
             });
         }
 
+        var displayLimitWatch = $scope.$watch('displayLimit', function () {
+            $scope.gridData.loadingFull = false;
+
+            if (enableWatchEvent && oldDisplayLimit !== $scope.displayLimit) {
+                oldDisplayLimit = $scope.displayLimit;
+                _refreshAsyncData();
+            }
+        });
+
         $scope.$on('$destroy', function () {
             if ($scope.gridOptions.enableSearch) {
                 globalSearchListener();
                 gridSearchWatch();
             }
+
+            displayLimitWatch();
         });
 
         // compile html
@@ -89,6 +112,10 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         // get conditionaly page count
         $scope.getRecordCount = function () {
+            if ($scope.gridOptions.async) {
+                return $scope.gridData.total || 0;
+            }
+
             var data = $scope.gridOptions.data || [];
 
             if ($scope.gridOptions.enableSearch === true) {
@@ -100,6 +127,10 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         // get conditionaly data
         $scope.getData = function () {
+            if ($scope.gridOptions.async) {
+                return $scope.gridData.data || [];
+            }
+
             var data = $scope.gridOptions.data || [];
 
             if ($scope.gridOptions.enableSearch === true) {
@@ -118,10 +149,30 @@ angular.module('m-grid.directive', ['m-grid.config'])
             return data;
         };
 
+        // refresh data on page change
         $scope.currentPageChange = function () {
             $scope.startFrom = ($scope.currentPage - 1) * $scope.displayLimit;
+
+            if (enableWatchEvent && $scope.gridOptions.async) {
+                $scope.gridData.loadingFull = false;
+                $scope.gridData.loading = true;
+
+                var options = _asyncOptions();
+
+                $scope.asyncData(options).then(function (data) {
+                    $scope.gridData.data = $scope.gridOptions.data = data;
+                    $scope.gridData.loading = false;
+                    $scope.gridData.firstLoaded = true;
+                    _forceApply();
+                }, function (error) {
+                    $scope.gridData.loading = false;
+                    $scope.gridData.firstLoaded = true;
+                    $log.error(error);
+                });
+            }
         };
 
+        // get status string
         $scope.getStatusString = function () {
             // 1 - 10 of 327 items
             var len = $scope.getRecordCount();
@@ -159,9 +210,11 @@ angular.module('m-grid.directive', ['m-grid.config'])
             searchTimer = $timeout(function () {
                 if ($scope.search !== value) {
                     $scope.search = value;
-                    // refreshAjaxData();
+                    if ($scope.gridOptions.async) {
+                        _refreshAsyncData();
+                    }
                 }
-            }, 500);
+            }, 1000);
         };
 
         /**
@@ -182,6 +235,121 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
         var _getFilteredData = function (data, search) {
             return $filter('filter')(data, search);
+        };
+
+        /**
+         * Create async data fetcher function
+         * @param {String} url
+         */
+        var _asyncRequest = function (url) {
+            return function (options) {
+                var _url = url;
+                angular.forEach(options, function (value, key) {
+                    if (angular.isUndefined(value)) {
+                        value = '';
+                    }
+                    _url = _url.replace('{' + key + '}', value);
+                });
+
+                return $http.get(_url)
+                    .then(function (res) {
+                        return res.data;
+                    }).catch(function (res) {
+                        return $q.reject(res.data);
+                    });
+            };
+        };
+
+        var _initAsync = function () {
+            if (
+                (typeof $scope.gridOptions.asyncData !== 'function' && typeof $scope.gridOptions.asyncData !== 'string') ||
+                (typeof $scope.gridOptions.asyncDataCount !== 'function' && typeof $scope.gridOptions.asyncDataCount !== 'string')
+             ) {
+                throw new Error('asyncData and asyncCount must a function or string');
+            }
+
+            if (typeof $scope.gridOptions.asyncData === 'function') {
+                $scope.asyncData = $scope.gridOptions.asyncData;
+            } else {
+                $scope.asyncData = _asyncRequest($scope.gridOptions.asyncData);
+            }
+
+            if (typeof $scope.gridOptions.asyncDataCount === 'function') {
+                $scope.asyncDataCount = $scope.gridOptions.asyncDataCount;
+            } else {
+                $scope.asyncDataCount = _asyncRequest($scope.gridOptions.asyncDataCount);
+            }
+        };
+
+        var _asyncOptions = function () {
+            var orderby = '';
+            if ($scope.predicate) {
+                orderby = ($scope.reverse ? '-' : '') + $scope.predicate;
+            }
+
+            var options = {};
+
+            if ($scope.gridOptions.urlParams && angular.isObject($scope.gridOptions.urlParams)) {
+                for (var key in $scope.gridOptions.urlParams) {
+                    options[key] = $scope.gridOptions.urlParams[key];
+                }
+            }
+
+            angular.extend(options, {
+                term: $scope.search,
+                orderby: orderby,
+                skip: $scope.startFrom,
+                take: $scope.displayLimit,
+                page: $scope.currentPage,
+                limit: $scope.displayLimit
+            });
+
+            return options;
+        };
+
+        var _refreshAsyncData = function () {
+            $scope.currentPage = 1;
+
+            var options = _asyncOptions();
+
+            $scope.gridData.loading = true;
+            $scope.gridData.loadingFull = true;
+            $scope.asyncDataCount(options).then(function (count) {
+                $scope.gridData.total = count;
+                _forceApply();
+
+                $scope.asyncData(options).then(function (data) {
+                    $scope.gridData.data = $scope.gridOptions.data = data;
+                    $scope.gridData.loading = false;
+                    $scope.gridData.firstLoaded = true;
+                    $scope.gridData.loadingFull = false;
+                    _forceApply();
+                }, function (error) {
+                    $scope.gridData.loading = false;
+                    $scope.gridData.firstLoaded = true;
+                    $scope.gridData.loadingFull = false;
+                    $log.error(error);
+                });
+            }, function (error) {
+                $scope.gridData.loading = false;
+                $scope.gridData.loadingFull = false;
+                $log.error(error);
+            });
+        };
+
+        var _forceApply = function () {
+            if (forceApplyPromise !== undefined) {
+                return;
+            }
+
+            forceApplyPromise = $timeout(function () {
+                forceApplyPromise = undefined;
+                if (!$scope.$$phase) {
+                    $scope.$apply();
+                } else {
+                    _forceApply();
+                }
+            }, 500);
         };
 
         /***********************************************
@@ -205,6 +373,14 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
             $scope.order(_fieldname, true);
         }
+
+        // async data
+        if ($scope.gridOptions.async) {
+            _initAsync();
+            _refreshAsyncData();
+        }
+
+        enableWatchEvent = true;
     }
 
     return {

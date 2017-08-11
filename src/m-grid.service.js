@@ -21,10 +21,12 @@ angular.module('m-grid.service', [])
         html += '</th>';
         html += '</tr>';
         html += '</thead>';
-        html += '<tbody>';
+        html += '<tbody ng-hide="gridData.loading && gridData.loadingFull">';
         html += getBodyTemplate(gridOptions);
         html += '</tbody>';
-        html += '</thead>';
+        html += '<tbody>';
+        html += '<tr ng-show="gridOptions.async && ((gridData.loading && gridData.loadingFull) || !gridData.firstLoaded)"><td colspan="' + gridOptions.columns.length + '" style="text-align:center; margin: 20px auto 10px;"><progress-circular></progress-circular></td></tr>';
+        html += '</tbody>';
         html += '</table>';
 
         if (gridOptions.disablePagination !== true) {
@@ -83,7 +85,9 @@ angular.module('m-grid.service', [])
 
         bodyTemplate += '</tr>';
 
-        bodyTemplate += '<tr ng-show="getRecordCount() == 0"><td colspan="' + gridOptions.columns.length + '"><div style="text-align:center; margin: 20px auto 20px;"><h3>No record found</h3></div></td></tr>';
+        // bodyTemplate += '<tr><td colspan="3"><pre>{{ {total: gridData.total, loading: gridData.loading, loadingFull: gridData.loadingFull, firstLoaded: gridData.firstLoaded} |json}}</pre></td></tr>';
+
+        bodyTemplate += '<tr ng-show="getRecordCount() == 0 && (!gridOptions.async || gridData.firstLoaded)"><td colspan="' + gridOptions.columns.length + '"><div style="text-align:center; margin: 20px auto 20px;"><h3>No record found</h3></div></td></tr>';
 
         return bodyTemplate;
     }
@@ -96,7 +100,7 @@ angular.module('m-grid.service', [])
      */
     function getPaginationTemplate (gridOptions, mGridConfig) {
         var html = '';
-        html += '<div ng-hide="getRecordCount() == 0" class="panel-footer ' + mGridConfig.footerClass + '">';
+        html += '<div ng-hide="getRecordCount() == 0 || (gridData.loading && gridData.loadingFull)" class="panel-footer ' + mGridConfig.footerClass + '">';
         html += '<m-grid-pagination class="pull-left" style="margin: 0px;" total-items="getRecordCount()" max-size="3" ng-model="currentPage" items-per-page="displayLimit" rotate="false" ng-change="currentPageChange()"></m-grid-pagination>';
         html += '<div class="pull-left" style=" margin-left: 10px;">';
         html += '<select class="form-control input-sm hidden-xs" style="display:inline-block; width: 70px; height: 29px;" type="text" ng-model="displayLimit" ng-options="o.value as o.text for o in displayLimitOptions"></select>';

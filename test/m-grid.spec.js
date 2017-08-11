@@ -2,12 +2,6 @@
 
 'use strict';
 
-describe('Basic unit test describe', function () {
-    it('Basic unit test equal test', function () {
-        expect(2).toBe(2);
-    });
-});
-
 describe('m-grid.directive', function () {
     var $compile, $rootScope, $timeout;
 
@@ -223,5 +217,138 @@ describe('m-grid.directive', function () {
         expect(gridScope.getStatusString()).toBe('1 - 1 of 1 items');
 
         gridScope.$destroy();
+    });
+
+    describe('m-grid async', function () {
+        var $q;
+
+        beforeEach(inject(function (_$q_) {
+            $q = _$q_;
+        }));
+
+        it('m-grid async data', function () {
+            var gridScope, element;
+
+            var $scope = $rootScope.$new();
+            $scope.gridOptions = {
+                columns: [{
+                    name: '#',
+                    field: 'id'
+                }, {
+                    name: 'No sort',
+                    field: 'nosort',
+                    sorting: false
+                }],
+                sorting: true,
+                defaultSorting: 'id',
+                enableSearch: true,
+                async: true
+            };
+
+            var htmlTemplate = '<m-grid grid-options="gridOptions"></m-grid>';
+            var errorMsg;
+
+            try {
+                $compile(htmlTemplate)($scope);
+            } catch (e) {
+                errorMsg = e.message;
+            }
+
+            expect(errorMsg).toBe('asyncData and asyncCount must a function or string');
+
+            var totalRecord = 15;
+            var firstPageRecord = [{page: 1}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+            var secondPageRecord = [{page: 2}, {}, {}, {}, {}];
+            var limit5PageRecord = [{limit: 5}, {}, {}, {}, {}];
+
+            $scope.gridOptions.asyncData = function (options) {
+                var defer = $q.defer();
+                if (options.limit > 20) {
+                    defer.reject('error');
+                } else if (options.limit === 5) {
+                    defer.resolve(limit5PageRecord);
+                } else if (options.page === 1) {
+                    defer.resolve(firstPageRecord);
+                } else if (options.page === 2) {
+                    defer.resolve(secondPageRecord);
+                } else {
+                    defer.reject('error');
+                }
+                return defer.promise;
+            };
+            $scope.gridOptions.asyncDataCount = function (options) {
+                var defer = $q.defer();
+                if (options.limit > 30) {
+                    defer.reject('error');
+                } else if (options.page < 5) {
+                    defer.resolve(totalRecord);
+                } else {
+                    defer.reject('error');
+                }
+                return defer.promise;
+            };
+
+            element = $compile(htmlTemplate)($scope);
+
+            $scope.$digest();
+
+            gridScope = element.isolateScope();
+
+            expect(gridScope.gridData.total).toBe(15);
+            expect(gridScope.gridData.data).toEqual(JSON.parse(JSON.stringify(firstPageRecord)));
+
+            gridScope.currentPage = 2;
+            gridScope.currentPageChange();
+            $scope.$digest();
+
+            expect(gridScope.gridData.data).toEqual(JSON.parse(JSON.stringify(secondPageRecord)));
+
+            gridScope.currentPage = 1;
+            gridScope.displayLimit = 5;
+            $scope.$digest();
+
+            expect(gridScope.gridData.data).toEqual(JSON.parse(JSON.stringify(limit5PageRecord)));
+
+            // api error block test
+            gridScope.displayLimit = 10;
+            gridScope.currentPage = 3;
+            gridScope.currentPageChange();
+            $scope.$digest();
+
+            gridScope.currentPage = 6;
+            gridScope.currentPageChange();
+            $scope.$digest();
+
+            gridScope.displayLimit = 30;
+            $scope.$digest();
+
+            gridScope.displayLimit = 40;
+            $scope.$digest();
+
+            // gridScope.gridOptions.search = '6';
+            // $scope.$digest();
+            // $timeout.flush();
+            // $timeout.verifyNoPendingTasks();
+            // $scope.$digest();
+
+            // expect(gridScope.currentPage).toBe(1);
+
+            $scope.$digest();
+
+            gridScope.gridData.total = undefined;
+            gridScope.gridData.data = undefined;
+
+            expect(gridScope.getRecordCount()).toBe(0);
+            expect(gridScope.getData()).toEqual([]);
+
+            $scope.gridOptions.urlParams = {
+                flag: true
+            };
+            gridScope.predicate = 'id';
+            gridScope.reverse = true;
+            $scope.$digest();
+            gridScope.currentPageChange();
+            $scope.$digest();
+        });
     });
 });
