@@ -1,0 +1,261 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+
+    <link rel="stylesheet" href="../src/m-grid.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.5/angular.min.js"></script>
+
+    <script src="../src/m-grid.module.js"></script>
+    <script src="../src/m-grid.config.js"></script>
+    <script src="../src/m-grid.service.js"></script>
+    <script src="../src/m-grid.directive.js"></script>
+    <script src="../src/m-grid.pagination.js"></script>
+    <script src="../src/m-grid.start-from.filter.js"></script>
+    <script src="../src/m-grid.progress-circular.directive.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/vs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+
+    <style>
+        html,
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            height: 100%;
+            font-size: 13px;
+        }
+
+        table {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">m-grid</a>
+            </div>
+        </div>
+    </nav>
+
+    <div ng-app="app" ng-controller="appCtrl" class="container">
+        <div class="pull-right"><input class="form-control" placeholder="Search" ng-model="gridOptions.search" /></div>
+        <div class="clearfix"></div>
+        <br/>
+        <m-grid grid-options="gridOptions"></m-grid>
+    </div>
+
+    <style>
+        .mytable tr td {
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+
+    <script>
+        var app = angular.module('app', ['m-grid']);
+
+        app.config(['mGridConfigProvider', function(mGridConfigProvider) {
+            mGridConfigProvider.setDisplayLimitOptions([1, 5, 50, 500]);
+            mGridConfigProvider.setDefaultPageLimit(5);
+            mGridConfigProvider.appendCssClass({
+                table: 'mytable',
+            })
+        }])
+
+        app.controller('appCtrl', function ($scope, $q, mGridConfig) {
+            $scope.gridOptions = {
+                columns: [{
+                    name: '#',
+                    field: 'id'
+                }, {
+                    name: 'Full name',
+                    field: 'fullName'
+                }, {
+                    name: 'Email',
+                    field: 'email'
+                }],
+                sorting: true,
+                defaultSorting: 'id',
+                async: true,
+                asyncData: function(options) {
+                    return new Promise(function(resolve, reject) {
+                        var d = Array.prototype.concat([], data);
+                        d = d.filter(function(item) {
+                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                        }).slice(options.skip, options.take + options.skip)
+                        setTimeout(function() {
+                            resolve(d);
+                        }, 1000);
+                    })
+                },
+                asyncDataCount:  function(options) {
+                    return new Promise(function(resolve, reject) {
+                        var d = Array.prototype.concat([], data);
+                        d = d.filter(function(item) {
+                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                        })
+                        setTimeout(function() {
+                            resolve(d.length);
+                        }, 1000);
+                    })
+                },
+                enableSearch: true,
+                config: {
+                    defaultPageLimit: 5,
+                }
+            };
+
+            var data = [];
+
+            for (var i = 0; i < 105; i++) {
+                data.push({
+                    id: (i + 1),
+                    fullName: 'Name ' + (i + 1),
+                    email: 'email' + (i + 1) + '@test.com'
+                })
+            }
+        })
+    </script>
+
+    <div class="container">
+        <h3>Code</h3>
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="html">
+&lt;div ng-app="app" ng-controller="appCtrl"&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+    .mytable tr td {
+        font-style: italic;
+        color: #777;
+    }
+&lt;/style&gt;
+
+&lt;script&gt;
+var app = angular.module('app', ['ui.bootstrap', 'm-grid']);
+
+app.config(['mGridConfigProvider', function(mGridConfigProvider) {
+    mGridConfigProvider.setDisplayLimitOptions([1, 5, 50, 500]);
+    mGridConfigProvider.setDefaultPageLimit(5);
+    mGridConfigProvider.appendCssClass({
+        table: 'mytable',
+    })
+}])
+
+app.controller('appCtrl', function($scope) {
+    $scope.gridOptions = {
+        columns: [{
+            name: '#',
+            field: 'id'
+        }, {
+            name: 'Full name',
+            field: 'fullName'
+        }, {
+            name: 'Email',
+            field: 'email'
+        }],
+        sorting: true,
+        defaultSorting: 'id',
+        async: true,
+        asyncData: 'http://example.com/dataurl?term={term}&skip={skip}&take={take}&orderby={orderby}&flag={flag}',
+        asyncDataCount: 'http://example.com/dataurl?term={term}&orderby={orderby}&flag={flag}',
+        urlParams: {
+            flag: true
+        },
+        enableSearch: true,
+        config: {
+            defaultPageLimit: 5,
+        }
+    };
+})
+&lt;/script&gt;
+      </code>
+    </pre>
+    <h3>API</h3>
+    <h4>1. mGridConfigProvider.setDisplayLimitOptions</h4>
+    <p>
+        With this api we can set limit options. This api have a parameter <code>limitOptions</code>. It should be a array.
+
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="javascript">mGridConfigProvider.setDisplayLimitOptions([10, 20, 50, 100]);
+
+// or
+
+mGridConfigProvider.setDisplayLimitOptions([{
+text: 'A',
+value: 10
+}, {
+text: 'B',
+value: 50
+}]);
+</code></pre>
+    </p>
+    <h4>2. mGridConfigProvider.setDefaultPageLimit</h4>
+    <p>
+        With this api we can set default page size. This api have parameter <code>limit</code>. It should be a number from <code>displayLimiteOptions</code></p>
+    </p>
+    <h4>3. mGridConfigProvider.appendCssClass</h4>
+    <p>
+        With this api we can add custom class for table and footer. Parameter of this api should be a object;
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="javascript">mGridConfigProvider.appendCssClass({
+    table: 'mytable',
+    th: 'myth',
+    footer: 'myfooter'
+})
+</code></pre>
+    </p>
+    <h4>3. mGridConfigProvider.setCssClass</h4>
+    <p>
+        With this api we can override grid class with custom class for table and footer. Parameter of this api should be a object;
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="javascript">mGridConfigProvider.setCssClass({
+    table: 'mytable',
+    th: 'myth',
+    footer: 'myfooter'
+})
+</code></pre>
+    </p>
+    <h4>Inline grid configuration</h4>
+    <p>
+        We can set configuration from gridOptions.
+        <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="javascript">$scope.gridOptions = {
+    // ...
+    config: {
+    defaultPageLimit: 5,
+}
+</code></pre>
+    </p>
+    <h4>Default configuration</h4>
+    <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="javascript">{
+    tableClass: 'table table-striped table-bordered m-grid-table',
+    thClass: 'm-grid-th',
+    footerClass: 'm-grid-footer',
+    defaultPageLimit: 10,
+    displayLimitOptions: [
+        { 'text': 10, 'value': 10 },
+        { 'text': 20, 'value': 20 },
+        { 'text': 50, 'value': 50 },
+        { 'text': 100, 'value': 100 }
+    ]
+}
+</code></pre>
+    <div class="alert alert-info">
+        <ul>
+            <li>
+                We can use a config style of grid, pagination limit and options.
+            </li>
+            <li>
+                We can define default page limit in global config and inline config. Inline config will consider first.
+            </li>
+        </ul>
+    </div>
+    </div>
+
+</body>
+
+</html>

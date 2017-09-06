@@ -29,7 +29,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
         // pagination option
         $scope.startFrom = 0;
         $scope.currentPage = 1;
-        $scope.displayLimit = 10;
+        $scope.displayLimit = ($scope.gridOptions.config || {}).defaultPageLimit || mGridConfig.defaultPageLimit;
 
         // options for async loading data
         $scope.gridData = {
