@@ -133,7 +133,7 @@ app.controller('appCtrl', function($scope) {
         defaultSorting: 'id',
         async: true,
         asyncData: 'http://example.com/dataurl?term={term}&skip={skip}&take={take}&orderby={orderby}&flag={flag}',
-        asyncDataCount: 'http://example.com/dataurl?term={term}&orderby={orderby}&flag={flag}',
+        asyncDataCount: 'http://example.com/datacounturl?term={term}&flag={flag}',
         urlParams: {
             flag: true
         }
