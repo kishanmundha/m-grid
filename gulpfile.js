@@ -31,7 +31,8 @@ function getConcatedStream () {
         './src/m-grid.directive.js',
         './src/m-grid.pagination.js',
         './src/m-grid.service.js',
-        './src/m-grid.start-from.filter.js'
+        './src/m-grid.start-from.filter.js',
+        './src/m-grid.progress-circular.directive.js'
     ])
     .pipe(concat('m-grid.js'))
     .pipe(indent({amount: 4}))

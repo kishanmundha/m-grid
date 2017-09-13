@@ -1,12 +1,13 @@
 {
   "name": "m-grid",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple grid for angular with pagination",
   "scripts": {
     "gulp": "gulp",
     "lint": "gulp test:lint",
     "test": "gulp test",
-    "bower": "bower"
+    "bower": "bower",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",

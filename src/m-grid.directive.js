@@ -19,7 +19,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
         var globalSearchListener;
         var enableWatchEvent = false;
         var forceApplyPromise;
-        var oldDisplayLimit = 10;
+        var oldDisplayLimit = ($scope.gridOptions.config || {}).defaultPageLimit || mGridConfig.defaultPageLimit;
 
         // local scope variables
         $scope.predicate = '';
@@ -62,7 +62,9 @@ angular.module('m-grid.directive', ['m-grid.config'])
 
             if (enableWatchEvent && oldDisplayLimit !== $scope.displayLimit) {
                 oldDisplayLimit = $scope.displayLimit;
-                _refreshAsyncData();
+                if ($scope.gridOptions.async) {
+                    _refreshAsyncData();
+                }
             }
         });
 
@@ -209,6 +211,8 @@ angular.module('m-grid.directive', ['m-grid.config'])
             // search on finish typing
             searchTimer = $timeout(function () {
                 if ($scope.search !== value) {
+                    $scope.startFrom = 0;
+                    $scope.currentPage = 1;
                     $scope.search = value;
                     if ($scope.gridOptions.async) {
                         _refreshAsyncData();
