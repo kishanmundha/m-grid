@@ -112,6 +112,7 @@
         <h3>Code</h3>
         <pre style="background-color: transparent; border: 1px solid #aaa;"><code class="html">
 &lt;div ng-app="app" ng-controller="appCtrl"&gt;
+    &lt;m-grid grid-options="gridOptions"&gt;&lt;/m-grid&gt;
 &lt;/div&gt;
 
 &lt;script&gt;
@@ -136,7 +137,7 @@ app.controller('appCtrl', function($scope) {
         asyncDataCount: 'http://example.com/datacounturl?term={term}&flag={flag}',
         urlParams: {
             flag: true
-        }
+        },
         enableSearch: true        
     };
 })
@@ -153,6 +154,12 @@ app.controller('appCtrl', function($scope) {
             </li>
             <li>
                 Internal query parameters is <code>term, orderby, skip, take, page, limit</code>
+            </li>
+            <li>
+                We get orderby field. In ascending order we get fieldname and in desending order we get <code>-</code> prefix.
+            </li>
+            <li>
+                For sorting there two more options <code>sortby</code> and <code>sorttype</code>. In <code>sortby</code>, we will get only fieldname and in <code>sorttype</code> we get <code>asc|desc</code>.
             </li>
         </ul>
     </div>

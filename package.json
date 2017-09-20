@@ -1,6 +1,6 @@
 {
   "name": "m-grid",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple grid for angular with pagination",
   "scripts": {
     "gulp": "gulp",
