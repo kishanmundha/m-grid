@@ -307,7 +307,7 @@ angular.module('m-grid.directive', ['m-grid.config'])
                 term: $scope.search,
                 orderby: orderby,
                 sortby: sortby,
-                sorttype: sortorder,
+                sortorder: sortorder,
                 skip: $scope.startFrom,
                 take: $scope.displayLimit,
                 page: $scope.currentPage,
