@@ -242,7 +242,10 @@ describe('m-grid.directive', function () {
                 sorting: true,
                 defaultSorting: 'id',
                 enableSearch: true,
-                async: true
+                async: true,
+                urlParams: {
+                    even: false
+                }
             };
 
             var htmlTemplate = '<m-grid grid-options="gridOptions"></m-grid>';
@@ -260,10 +263,13 @@ describe('m-grid.directive', function () {
             var firstPageRecord = [{page: 1}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
             var secondPageRecord = [{page: 2}, {}, {}, {}, {}];
             var limit5PageRecord = [{limit: 5}, {}, {}, {}, {}];
+            var evenPageRecord = [{even: true}];
 
             $scope.gridOptions.asyncData = function (options) {
                 var defer = $q.defer();
-                if (options.limit > 20) {
+                if (options.even) {
+                    defer.resolve(evenPageRecord);
+                } else if (options.limit > 20) {
                     defer.reject('error');
                 } else if (options.limit === 5) {
                     defer.resolve(limit5PageRecord);
@@ -278,7 +284,9 @@ describe('m-grid.directive', function () {
             };
             $scope.gridOptions.asyncDataCount = function (options) {
                 var defer = $q.defer();
-                if (options.limit > 30) {
+                if (options.even) {
+                    defer.resolve(1);
+                } else if (options.limit > 30) {
                     defer.reject('error');
                 } else if (options.page < 5) {
                     defer.resolve(totalRecord);
@@ -325,6 +333,11 @@ describe('m-grid.directive', function () {
             gridScope.displayLimit = 40;
             $scope.$digest();
 
+            $scope.gridOptions.urlParams.even = true;
+            $scope.$digest();
+
+            expect(gridScope.gridData.data).toEqual(JSON.parse(JSON.stringify(evenPageRecord)));
+
             // gridScope.gridOptions.search = '6';
             // $scope.$digest();
             // $timeout.flush();
@@ -349,6 +362,8 @@ describe('m-grid.directive', function () {
             $scope.$digest();
             gridScope.currentPageChange();
             $scope.$digest();
+
+            gridScope.$destroy();
         });
     });
 });

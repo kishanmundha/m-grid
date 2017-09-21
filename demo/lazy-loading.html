@@ -46,7 +46,14 @@
     </nav>
 
     <div ng-app="app" ng-controller="appCtrl" class="container">
-        <div class="pull-right"><input class="form-control" placeholder="Search" ng-model="gridOptions.search" /></div>
+        <div class="pull-right">
+            <div style="display: inline-block">
+                <label><input type="checkbox" ng-model="gridOptions.urlParams.even" /> Even only</label>
+            </div>
+            <div style="display: inline-block">
+                <input class="form-control" placeholder="Search" ng-model="gridOptions.search" />
+            </div>
+        </div>
         <div class="clearfix"></div>
         <br/>
         <m-grid grid-options="gridOptions"></m-grid>
@@ -75,7 +82,7 @@
                     return new Promise(function(resolve, reject) {
                         var d = Array.prototype.concat([], data);
                         d = d.filter(function(item) {
-                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                            return (!options.term || item.fullName.indexOf(options.term) !== -1) && (!options.even || item.id % 2 === 0)
                         }).slice(options.skip, options.take + options.skip)
                         setTimeout(function() {
                             resolve(d);
@@ -86,14 +93,17 @@
                     return new Promise(function(resolve, reject) {
                         var d = Array.prototype.concat([], data);
                         d = d.filter(function(item) {
-                            return !options.term || item.fullName.indexOf(options.term) !== -1
+                            return (!options.term || item.fullName.indexOf(options.term) !== -1) && (!options.even || item.id % 2 === 0)
                         })
                         setTimeout(function() {
                             resolve(d.length);
                         }, 1000);
                     })
                 },
-                enableSearch: true
+                enableSearch: true,
+                urlParams: {
+                    even: false
+                }
             };
 
             var data = [];
@@ -160,6 +170,9 @@ app.controller('appCtrl', function($scope) {
             </li>
             <li>
                 For sorting there two more options <code>sortby</code> and <code>sorttype</code>. In <code>sortby</code>, we will get only fieldname and in <code>sorttype</code> we get <code>asc|desc</code>.
+            </li>
+            <li>
+                Optional custom proeprty we can pass in urlParams.
             </li>
         </ul>
     </div>
